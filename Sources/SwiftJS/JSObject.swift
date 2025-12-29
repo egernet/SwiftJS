@@ -34,10 +34,10 @@ import CJSCore
 #endif
 
 /// A JavaScript object.
-public class JSObject {
-    
+public class JSObject: @unchecked Sendable {
+
     public let context: JSContext
-    
+
     let object: JSObjectRef
     
     init(context: JSContext, object: JSObjectRef) {

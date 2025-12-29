@@ -80,50 +80,50 @@ extension JSContext {
 }
 
 extension JSContext {
-    
+
     /// The global object.
-    open var global: JSObject {
+    public var global: JSObject {
         return JSObject(context: self, object: JSContextGetGlobalObject(context))
     }
-    
+
     /// Performs a JavaScript garbage collection.
     ///
     /// During JavaScript execution, you are not required to call this function; the JavaScript engine will garbage collect as needed.
     /// JavaScript values created within a context group are automatically destroyed when the last reference to the context group is released.
-    open func garbageCollect() {
+    public func garbageCollect() {
         JSGarbageCollect(context)
     }
 }
 
 extension JSContext {
-    
-    /// Get the names of global’s enumerable properties
-    open var properties: [String] {
+
+    /// Get the names of global's enumerable properties
+    public var properties: [String] {
         return global.properties
     }
-    
+
     /// Tests whether global has a given property.
     ///
     /// - Parameters:
     ///   - property: The property's name.
-    ///   
+    ///
     /// - Returns: true if the object has `property`, otherwise false.
-    open func hasProperty(_ property: String) -> Bool {
+    public func hasProperty(_ property: String) -> Bool {
         return global.hasProperty(property)
     }
-    
+
     /// Deletes a property from global.
-    /// 
+    ///
     /// - Parameters:
     ///   - property: The property's name.
-    ///   
+    ///
     /// - Returns: true if the delete operation succeeds, otherwise false.
     @discardableResult
-    open func removeProperty(_ property: String) -> Bool {
+    public func removeProperty(_ property: String) -> Bool {
         return global.removeProperty(property)
     }
-    
-    open subscript(property: String) -> JSObject {
+
+    public subscript(property: String) -> JSObject {
         get {
             return global[property]
         }
@@ -134,26 +134,26 @@ extension JSContext {
 }
 
 extension JSContext {
-    
+
     /// Checks for syntax errors in a string of JavaScript.
     ///
     /// - Parameters:
     ///   - script: The script to check for syntax errors.
     ///   - sourceURL: A URL for the script's source file. This is only used when reporting exceptions. Pass `nil` to omit source file information in exceptions.
     ///   - startingLineNumber: An integer value specifying the script's starting line number in the file located at sourceURL. This is only used when reporting exceptions.
-    ///   
+    ///
     /// - Returns: true if the script is syntactically correct; otherwise false.
-    open func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
-        
+    public func checkScriptSyntax(_ script: String, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> Bool {
+
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
-        
+
         let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
-        
+
         return JSCheckScriptSyntax(context, script, sourceURL, Int32(startingLineNumber), &_exception)
     }
-    
+
     /// Evaluates a string of JavaScript.
     ///
     /// - Parameters:
@@ -161,19 +161,19 @@ extension JSContext {
     ///   - this: The object to use as this or `nil` to use the global object as this.
     ///   - sourceURL: A URL for the script's source file. This is only used when reporting exceptions. Pass `nil` to omit source file information in exceptions.
     ///   - startingLineNumber: An integer value specifying the script's starting line number in the file located at sourceURL. This is only used when reporting exceptions.
-    ///   
+    ///
     /// - Returns: true if the script is syntactically correct; otherwise false.
     @discardableResult
-    open func evaluateScript(_ script: String, this: JSObject? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
-        
+    public func evaluateScript(_ script: String, this: JSObject? = nil, sourceURL: URL? = nil, startingLineNumber: Int = 0) -> JSObject {
+
         let script = script.withCString(JSStringCreateWithUTF8CString)
         defer { JSStringRelease(script) }
-        
+
         let sourceURL = sourceURL?.absoluteString.withCString(JSStringCreateWithUTF8CString)
         defer { sourceURL.map(JSStringRelease) }
-        
+
         let result = JSEvaluateScript(context, script, this?.object, sourceURL, Int32(startingLineNumber), &_exception)
-        
+
         return result.map { JSObject(context: self, object: $0) } ?? JSObject(undefinedIn: self)
     }
 }
