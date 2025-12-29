@@ -7,7 +7,74 @@
 [![Swift](https://img.shields.io/badge/swift-5.3-orange.svg?style=flat)](https://swift.org)
 [![MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-A cross platform Javascript engine for Swift.
+A cross platform JavaScript engine for Swift.
+
+## Installation
+
+Add SwiftJS to your `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/SusanDoggie/SwiftJS.git", from: "1.0.0")
+]
+```
+
+## Usage
+
+### Basic JavaScript Evaluation
+
+```swift
+import SwiftJS
+
+let context = JSContext()
+let result = context.evaluateScript("1 + 2")
+print(result.doubleValue!) // 3.0
+```
+
+### Working with JavaScript Objects
+
+```swift
+let context = JSContext()
+
+// Create and manipulate objects
+let array = context.evaluateScript("[1, 2, 3]")
+print(array[0].doubleValue!) // 1.0
+print(array.count) // 3
+
+// Access properties
+let obj = context.evaluateScript("({name: 'John', age: 30})")
+print(obj["name"].stringValue!) // "John"
+```
+
+### Swift Functions in JavaScript
+
+```swift
+let context = JSContext()
+
+let multiply = JSObject(newFunctionIn: context) { context, this, args in
+    let a = args[0].doubleValue!
+    let b = args[1].doubleValue!
+    return JSObject(double: a * b, in: context)
+}
+
+context.global["multiply"] = multiply
+let result = context.evaluateScript("multiply(6, 7)")
+print(result.doubleValue!) // 42.0
+```
+
+### JSON Interoperability
+
+```swift
+let context = JSContext()
+
+// Swift dictionary to JavaScript object
+let data: [String: Any] = ["name": "Alice", "scores": [10, 20, 30]]
+context.global["data"] = JSObject(jsonObject: data, in: context)
+
+// JavaScript object to Swift
+let jsObj = context.evaluateScript("({x: 1, y: 2})")
+let dict = jsObj.toJsonObject() as? [String: Any]
+```
 
 ## System Requirements
 
