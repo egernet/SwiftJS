@@ -44,4 +44,4 @@ This is configured in `Package.swift` with `#if os(Linux)` directives.
 
 ### Dependencies
 
-- **Doggie** (6.4.0+) - Provides `DoggieCore` utility functions
+No external dependencies - uses only Foundation and JavaScriptCore.

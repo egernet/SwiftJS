@@ -23,4 +23,4 @@
 //  THE SOFTWARE.
 //
 
-@_exported import DoggieCore
+@_exported import Foundation

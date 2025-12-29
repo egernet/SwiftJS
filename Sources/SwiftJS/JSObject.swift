@@ -63,10 +63,12 @@ extension JSObject {
 }
 
 extension JSObject {
-    
-    public convenience init(json: Json, in context: JSContext) {
-        if let json = json.json() {
-            let json = json.withCString(JSStringCreateWithUTF8CString)
+
+    public convenience init(jsonObject: Any, in context: JSContext) {
+        if JSONSerialization.isValidJSONObject(jsonObject),
+           let data = try? JSONSerialization.data(withJSONObject: jsonObject),
+           let jsonString = String(data: data, encoding: .utf8) {
+            let json = jsonString.withCString(JSStringCreateWithUTF8CString)
             defer { JSStringRelease(json) }
             self.init(context: context, object: JSValueMakeFromJSONString(context.context, json))
         } else {
@@ -343,11 +345,13 @@ extension JSObject {
 }
 
 extension JSObject {
-    
-    public func toJson() -> Json? {
+
+    public func toJsonObject() -> Any? {
         let str = JSValueCreateJSONString(context.context, object, 0, nil)
         defer { str.map(JSStringRelease) }
-        return str.map(String.init).flatMap { try? Json(decode: $0) }
+        guard let jsonString = str.map(String.init),
+              let data = jsonString.data(using: .utf8) else { return nil }
+        return try? JSONSerialization.jsonObject(with: data)
     }
 }
 
